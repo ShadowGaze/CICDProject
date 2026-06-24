@@ -10,8 +10,7 @@ services:
       POSTGRES_PASSWORD: mypassword
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    # ← no ports here, db is only accessible inside Docker network
 
   web:
     build: .
