@@ -10,5 +10,5 @@ app.secret_key = config('SECRET_KEY', default='dev-secret')
 app.register_blueprint(user_bp)
 
 if __name__ == '__main__':
-    init_db()          # creates the table if it doesn't exist
-    app.run(debug=True)
+    init_db()
+    app.run(host='0.0.0.0', port=5000, debug=False)
