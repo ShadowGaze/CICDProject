@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask CRUD</title>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        .navbar {
+            background: #0a0a23;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            text-decoration: none;
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: .3px;
+        }
+
+        .navbar-brand span {
+            color: #4d9fff;
+        }
+
+        .navbar-links {
+            display: flex;
+            align-items: center;
+            gap: .25rem;
+            list-style: none;
+        }
+
+        .navbar-links a {
+            display: flex;
+            align-items: center;
+            gap: .45rem;
+            color: #b0b8cc;
+            text-decoration: none;
+            font-size: .9rem;
+            font-weight: 500;
+            padding: .5rem .9rem;
+            border-radius: 6px;
+            transition: background .18s, color .18s;
+        }
+
+        .navbar-links a:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+
+        .navbar-links a.active {
+            background: #0055cc;
+            color: #fff;
+        }
+
+        .navbar-links .icon {
+            font-size: 1rem;
+        }
+
+
+        .page {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3rem 1.5rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 960px;
+        }
+
+
+        .page-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 1.5rem;
+        }
+
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+
+        label {
+            display: block;
+            margin-bottom: .3rem;
+            font-weight: 600;
+            font-size: .875rem;
+            color: #444;
+        }
+
+        input {
+            width: 100%;
+            padding: .6rem .8rem;
+            border: 1.5px solid #dde1e9;
+            border-radius: 8px;
+            margin-bottom: 1.1rem;
+            font-size: .95rem;
+            color: #1a1a2e;
+            background: #fafafa;
+            transition: border-color .18s, box-shadow .18s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #0055cc;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(0, 85, 204, .12);
+        }
+
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .55rem 1.3rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: .9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background .18s, transform .1s;
+        }
+
+        .btn:active {
+            transform: scale(.97);
+        }
+
+        .btn-primary {
+            background: #0055cc;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #0044aa;
+        }
+
+        .btn-danger {
+            background: #e53e3e;
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-secondary {
+            background: #e8eaf0;
+            color: #444;
+        }
+
+        .btn-secondary:hover {
+            background: #d8dbe8;
+        }
+
+        .error {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            color: #c0392b;
+            border-radius: 8px;
+            padding: .7rem 1rem;
+            margin-bottom: 1.2rem;
+            font-size: .875rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+
+        .table-wrapper {
+            width: 100%;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead tr {
+            background: #0a0a23;
+        }
+
+        th {
+            padding: .9rem 1.2rem;
+            text-align: left;
+            color: #b0b8cc;
+            font-size: .8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+        }
+
+        td {
+            padding: .85rem 1.2rem;
+            border-bottom: 1px solid #f0f2f5;
+            font-size: .9rem;
+            color: #333;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr {
+            transition: background .15s;
+        }
+
+        tbody tr:hover td {
+            background: #f7f9ff;
+        }
+
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #888;
+        }
+
+        .empty-state .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            margin-bottom: 1.25rem;
+            font-size: .95rem;
+        }
+
+
+        footer {
+            text-align: center;
+            padding: 1.25rem;
+            font-size: .8rem;
+            color: #aaa;
+            background: #fff;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            Flask<span>CRUD</span>
+        </a>
+
+        <ul class="navbar-links">
+            <li>
+                <a href="/">
+                    Add User
+                </a>
+            </li>
+            <li>
+                <a href="/users">
+                    All Users
+                </a>
+            </li>
+            <li>
+                <a href="/dashboard">
+                    Dashboard
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+
+    <div class="page">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+
+    <footer>
+        Flask CRUD App &mdash; Built with Python &amp; PostgreSQL
+    </footer>
+
+
+</body>
+
+</html>

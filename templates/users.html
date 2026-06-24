@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>All Users</h1>
+
+{% if users %}
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Name</th>
+      <th>Date of Birth</th>
+      <th>Email</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in users %}
+    <tr>
+      <td>{{ user.id }}</td>
+      <td>{{ user.name }}</td>
+      <td>{{ user.dob }}</td>
+      <td>{{ user.email }}</td>
+      <td>
+        <form method="POST" action="/delete/{{ user.id }}">
+          <button class="btn btn-danger" type="submit"
+            onclick="return confirm('Delete {{ user.name }}?')">
+            Delete
+          </button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No users yet. <a href="/">Add one!</a></p>
+{% endif %}
+{% endblock %}

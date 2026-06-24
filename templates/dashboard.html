@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 style="margin-bottom:.5rem;"> Sales Dashboard</h1>
+<p style="color:#555; margin-bottom:2rem;">Live data from PostgreSQL — rendered by Chart.js in the browser</p>
+
+<!-- Hidden div — carries all Flask data safely into JavaScript -->
+<div id="chart-data" data-bar-labels='{{ bar_labels }}' data-bar-values='{{ bar_values }}'
+    data-pie-labels='{{ pie_labels }}' data-pie-values='{{ pie_values }}' data-line-labels='{{ line_labels }}'
+    data-line-values='{{ line_values }}' data-doughnut-labels='{{ doughnut_labels }}'
+    data-doughnut-values='{{ doughnut_values }}'></div>
+
+<!-- Row 1 — Bar + Pie -->
+<div style="display:flex; gap:1.5rem; flex-wrap:wrap; margin-bottom:1.5rem;">
+
+    <div style="flex:1; min-width:300px; background:#fff; border-radius:8px;
+              padding:1.5rem; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+        <h3 style="margin-bottom:1rem; font-size:.95rem; color:#333;"> Total Sales by Month (Bar)</h3>
+        <canvas id="barChart"></canvas>
+    </div>
+
+    <div style="flex:1; min-width:300px; background:#fff; border-radius:8px;
+              padding:1.5rem; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+        <h3 style="margin-bottom:1rem; font-size:.95rem; color:#333;"> Sales by Category (Pie)</h3>
+        <canvas id="pieChart"></canvas>
+    </div>
+
+</div>
+
+<!-- Row 2 — Line + Doughnut -->
+<div style="display:flex; gap:1.5rem; flex-wrap:wrap;">
+
+    <div style="flex:1; min-width:300px; background:#fff; border-radius:8px;
+              padding:1.5rem; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+        <h3 style="margin-bottom:1rem; font-size:.95rem; color:#333;"> Sales Trend (Line)</h3>
+        <canvas id="lineChart"></canvas>
+    </div>
+
+    <div style="flex:1; min-width:300px; background:#fff; border-radius:8px;
+              padding:1.5rem; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+        <h3 style="margin-bottom:1rem; font-size:.95rem; color:#333;"> Sales by Region (Doughnut)</h3>
+        <canvas id="doughnutChart"></canvas>
+    </div>
+
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+    // Read data from hidden div — avoids all Jinja2 inside JS issues
+    const el = document.getElementById('chart-data');
+
+    const barLabels = JSON.parse(el.dataset.barLabels);
+    const barValues = JSON.parse(el.dataset.barValues);
+    const pieLabels = JSON.parse(el.dataset.pieLabels);
+    const pieValues = JSON.parse(el.dataset.pieValues);
+    const lineLabels = JSON.parse(el.dataset.lineLabels);
+    const lineValues = JSON.parse(el.dataset.lineValues);
+    const doughnutLabels = JSON.parse(el.dataset.doughnutLabels);
+    const doughnutValues = JSON.parse(el.dataset.doughnutValues);
+
+    const COLORS = ['#0055cc', '#e0a800', '#c0392b', '#27ae60', '#8e44ad', '#2980b9'];
+
+    // ── Bar Chart ──────────────────────────────────────────────
+    new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+            labels: barLabels,
+            datasets: [{
+                label: 'Sales (£)',
+                data: barValues,
+                backgroundColor: '#0055cc',
+                borderRadius: 4,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    // ── Pie Chart ──────────────────────────────────────────────
+    new Chart(document.getElementById('pieChart'), {
+        type: 'pie',
+        data: {
+            labels: pieLabels,
+            datasets: [{
+                data: pieValues,
+                backgroundColor: COLORS,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+
+    // ── Line Chart ─────────────────────────────────────────────
+    new Chart(document.getElementById('lineChart'), {
+        type: 'line',
+        data: {
+            labels: lineLabels,
+            datasets: [{
+                label: 'Sales (£)',
+                data: lineValues,
+                borderColor: '#c0392b',
+                backgroundColor: 'rgba(192,57,43,0.1)',
+                borderWidth: 2,
+                pointRadius: 5,
+                fill: true,
+                tension: 0.3,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    // ── Doughnut Chart ─────────────────────────────────────────
+    new Chart(document.getElementById('doughnutChart'), {
+        type: 'doughnut',
+        data: {
+            labels: doughnutLabels,
+            datasets: [{
+                data: doughnutValues,
+                backgroundColor: COLORS,
+                hoverOffset: 10,
+            }]
+
+
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+</script>
+
+{% endblock %}
