@@ -1,3 +1,4 @@
+import os
 import pytest
 from app import app as flask_app
 from models.user_model import get_all_users, create_user, delete_user
@@ -8,11 +9,11 @@ import psycopg2
 
 def get_test_connection():
     return psycopg2.connect(
-        dbname='crud_test_db',
-        user='postgres',
-        password='1234',
-        host='localhost',
-        port='5432',
+        dbname=os.getenv('DB_NAME', 'test_db'),
+        user=os.getenv('DB_USER', 'postgres'),
+        password=os.getenv('DB_PASSWORD', 'postgres'),
+        host=os.getenv('DB_HOST', 'localhost'),
+        port=os.getenv('DB_PORT', '5432'),
     )
 
 # ── Fixtures ─────────────────────────────────────────────
