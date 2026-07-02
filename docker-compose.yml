@@ -14,7 +14,7 @@ services:
     env_file:
       - .env
     expose:
-      - "8000"
+      - "5000"
     depends_on:
       - db
     restart: always
