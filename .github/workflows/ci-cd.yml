@@ -78,7 +78,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ubuntu/CICDProject
-            docker pull ${{ secrets.DOCKER_USERNAME }}/cicdproject:latest
+            docker compose pull
             docker compose down
             docker compose up -d
             docker compose ps
